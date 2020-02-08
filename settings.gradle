@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name='去他妈的微信信息流'
