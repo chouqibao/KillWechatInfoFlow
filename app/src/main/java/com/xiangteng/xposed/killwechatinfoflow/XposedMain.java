@@ -18,11 +18,17 @@ public class XposedMain implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         //if (lpparam.packageName.equals("com.xiangteng.xposed.killwechatinfoflow")) {
-            //Log.i(LOG_TAG, "Module Activated!");
+        //Log.i(LOG_TAG, "Module Activated!");
         //}
 
         if (lpparam.packageName.equals("com.tencent.mm")) {
-            findAndHookMethod(Activity.class, "startActivity", Intent.class, Bundle.class, new XC_MethodHook() {
+            findAndHookMethod("com.tencent.mm.storage.s", lpparam.classLoader, "blj", new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    param.setResult(false);
+                }
+            });
+            /*findAndHookMethod(Activity.class, "startActivity", Intent.class, Bundle.class, new XC_MethodHook() {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Intent intent = (Intent) param.args[0];
                     String target = intent.getComponent().getClassName();
@@ -32,7 +38,7 @@ public class XposedMain implements IXposedHookLoadPackage {
                         param.args[0] = new Intent((Activity) param.thisObject, clazz);
                     }
                 }
-            });
+            });*/
         }
     }
 }
