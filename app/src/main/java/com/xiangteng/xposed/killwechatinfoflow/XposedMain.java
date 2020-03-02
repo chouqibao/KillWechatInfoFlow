@@ -1,6 +1,8 @@
 package com.xiangteng.xposed.killwechatinfoflow;
 
 import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,33 +15,58 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 public class XposedMain implements IXposedHookLoadPackage {
 
-    public static String LOG_TAG = "Xposed-KillWechatInfoFlow";
+    private static String LOG_TAG = "KWIF";
+    private static ClassLoader classloader;
 
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
-        //if (lpparam.packageName.equals("com.xiangteng.xposed.killwechatinfoflow")) {
-        //Log.i(LOG_TAG, "Module Activated!");
-        //}
+        if (!lpparam.packageName.equals("com.tencent.mm"))
+            return;
+        Log.i(LOG_TAG, "WeChat Hooked.");
+        try {
+            findAndHookMethod(Application.class, "attach", Context.class, new XC_MethodHook() {
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Log.i(LOG_TAG, "attach() hooked.");
+                    classloader = ((Context) param.args[0]).getClassLoader();
+                    hook();
+                }
+            });
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook attach() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }
+    }
 
-        if (lpparam.packageName.equals("com.tencent.mm")) {
-            findAndHookMethod("com.tencent.mm.storage.s", lpparam.classLoader, "blj", new XC_MethodHook() {
+    private void hook() {
+        try {
+            findAndHookMethod("com.tencent.mm.storage.s", classloader, "blj", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    Log.i(LOG_TAG, "com.tencent.mm.storage.s.blj() called.");
                     param.setResult(false);
                 }
             });
-            /*findAndHookMethod(Activity.class, "startActivity", Intent.class, Bundle.class, new XC_MethodHook() {
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook com.tencent.mm.storage.s.blj() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }
+
+        /*try {
+            findAndHookMethod(Activity.class, "startActivity", Intent.class, Bundle.class, new XC_MethodHook() {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Intent intent = (Intent) param.args[0];
                     String target = intent.getComponent().getClassName();
                     if (target.equals("com.tencent.mm.plugin.brandservice.ui.timeline.BizTimeLineUI")) {
                         //Class<?> clazz = lpparam.classLoader.loadClass("com.tencent.mm.ui.conversation.NewBizConversationUI");
-                        Class<?> clazz = lpparam.classLoader.loadClass("com.tencent.mm.ui.conversation.BizConversationUI");
+                        Class<?> clazz = classloader.loadClass("com.tencent.mm.ui.conversation.BizConversationUI");
                         param.args[0] = new Intent((Activity) param.thisObject, clazz);
                     }
                 }
-            });*/
-        }
+            });
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook startActivity() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }*/
     }
 }
 
