@@ -61,7 +61,7 @@ public class XposedMain implements IXposedHookLoadPackage {
         } catch (Throwable e) {
             Log.e(LOG_TAG, "Hook com.tencent.mm.storage.s.bvn() error.");
             Log.e(LOG_TAG, Log.getStackTraceString(e));
-        }*/
+        }
 
         try {
             findAndHookMethod("com.tencent.mm.sdk.platformtools.az", classloader, "decodeInt", String.class, int.class, new XC_MethodHook() {
@@ -78,7 +78,37 @@ public class XposedMain implements IXposedHookLoadPackage {
             Log.e(LOG_TAG, Log.getStackTraceString(e));
         }
 
-        /*try {
+        try {
+            findAndHookMethod("com.tencent.mm.sdk.platformtools.as", classloader, "decodeInt", String.class, int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if (param.args[0].toString().equals("BizTimeLineOpenStatus")) {
+                        Log.i(LOG_TAG, "com.tencent.mm.sdk.platformtools.as.decodeInt() called.");
+                        param.setResult(0);
+                    }
+                }
+            });
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook com.tencent.mm.sdk.platformtools.as.decodeInt() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }*/
+
+        try {
+            findAndHookMethod("com.tencent.mmkv.MMKV", classloader, "decodeInt", String.class, int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if (param.args[0].toString().equals("BizTimeLineOpenStatus")) {
+                        Log.i(LOG_TAG, "com.tencent.mmkv.MMKV.decodeInt(\"BizTimeLineOpenStatus\") called.");
+                        param.setResult(0);
+                    }
+                }
+            });
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook com.tencent.mmkv.MMKV.decodeInt() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }
+
+        try {
             findAndHookMethod(Activity.class, "startActivity", Intent.class, Bundle.class, new XC_MethodHook() {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Intent intent = (Intent) param.args[0];
@@ -93,7 +123,7 @@ public class XposedMain implements IXposedHookLoadPackage {
         } catch (Throwable e) {
             Log.e(LOG_TAG, "Hook startActivity() error.");
             Log.e(LOG_TAG, Log.getStackTraceString(e));
-        }*/
+        }
     }
 }
 

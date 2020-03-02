@@ -19,10 +19,13 @@
 + [#1](https://github.com/chouqibao/KillWechatInfoFlow/issues/1)：似乎多见于一加 7/7T 系列，这些机型的用户烦请关注一下，即使模块正常运行也请报告一下。
 
 ## 更新日志
+##### 2020.03.03 v5.0  再次更改 hook 点
+将 hook 点更改为 `com.tencent.mmkv.MMKV.decodeInt("BizTimeLineOpenStatus", int)`，理论上此 hook 点应比较稳定。
+
+此外，该版本也将第一版所用的重定向 `intent` 的方法也加进来了，双管齐下，提高成功率。
 
 ##### 2020.03.02 v4.0  更改 hook 点
 前述 `com.tencent.mm.storage.s.blj()` 在微信更新后方法名可能会改变，从而导致失效。查看该方法内部代码后，将 hook 点换为 `com.tencent.mm.sdk.platformtools.az.decodeInt("BizTimeLineOpenStatus", int)`，将该方法的返回值设为 `0` 即可。
-
 
 ##### 2020.03.02 v3.0  兼容 Play 版微信
 
