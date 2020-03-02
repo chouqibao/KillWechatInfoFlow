@@ -38,7 +38,7 @@ public class XposedMain implements IXposedHookLoadPackage {
     }
 
     private void hook() {
-        try {
+        /*try {
             findAndHookMethod("com.tencent.mm.storage.s", classloader, "blj", new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -48,6 +48,33 @@ public class XposedMain implements IXposedHookLoadPackage {
             });
         } catch (Throwable e) {
             Log.e(LOG_TAG, "Hook com.tencent.mm.storage.s.blj() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }
+
+        try {
+            findAndHookMethod("com.tencent.mm.storage.s", classloader, "bvn", new XC_MethodHook() {
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    Log.i(LOG_TAG, "com.tencent.mm.storage.s.bvn() called.");
+                    param.setResult(false);
+                }
+            });
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook com.tencent.mm.storage.s.bvn() error.");
+            Log.e(LOG_TAG, Log.getStackTraceString(e));
+        }*/
+
+        try {
+            findAndHookMethod("com.tencent.mm.sdk.platformtools.az", classloader, "decodeInt", String.class, int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if (param.args[0].toString().equals("BizTimeLineOpenStatus")) {
+                        Log.i(LOG_TAG, "com.tencent.mm.sdk.platformtools.az.decodeInt() called.");
+                        param.setResult(0);
+                    }
+                }
+            });
+        } catch (Throwable e) {
+            Log.e(LOG_TAG, "Hook com.tencent.mm.sdk.platformtools.az.decodeInt() error.");
             Log.e(LOG_TAG, Log.getStackTraceString(e));
         }
 
