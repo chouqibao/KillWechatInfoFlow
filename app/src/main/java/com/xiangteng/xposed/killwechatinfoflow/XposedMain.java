@@ -41,35 +41,41 @@ public class XposedMain implements IXposedHookLoadPackage {
 
     private void hook() {
         try {
-            findAndHookMethod("com.tencent.mmkv.MMKV", classloader, "decodeInt", long.class, String.class, int.class, new XC_MethodHook() {
+            Class mmkvClass = classloader.loadClass("com.tencent.mmkv.MMKV");
+            XC_MethodHook callBack = new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
-                    if (param.args[1].equals("BizTimeLineOpenStatus")) {
-                        Log.i(LOG_TAG, "com.tencent.mmkv.MMKV.decodeInt(\"BizTimeLineOpenStatus\") called.");
+                    if (param.args[0].equals("BizTimeLineOpenStatus")) {
+                        Log.i(LOG_TAG, "MMKV get config BizTimeLineOpenStatus called.");
                         param.setResult(0);
                         XposedHelpers.callMethod(param.thisObject, "putInt", "BizTimeLineOpenStatus", 0);
                     }
                 }
-            });
-        } catch (Throwable t) {
-            Log.e(LOG_TAG, "Hook com.tencent.mmkv.MMKV.decodeInt() error.", t);
-        }
+            };
 
-        /*try {
-            findAndHookMethod(Activity.class, "startActivity", Intent.class, Bundle.class, new XC_MethodHook() {
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Intent intent = (Intent) param.args[0];
-                    String target = intent.getComponent().getClassName();
-                    if (target.equals("com.tencent.mm.plugin.brandservice.ui.timeline.BizTimeLineUI")) {
-                        //Class<?> clazz = lpparam.classLoader.loadClass("com.tencent.mm.ui.conversation.NewBizConversationUI");
-                        Class<?> clazz = classloader.loadClass("com.tencent.mm.ui.conversation.BizConversationUI");
-                        param.args[0] = new Intent((Activity) param.thisObject, clazz);
-                    }
-                }
-            });
+            try {
+                findAndHookMethod(mmkvClass, "decodeInt", String.class, callBack);
+                Log.i(LOG_TAG, "Successfully hooked com.tencent.mmkv.MMKV.decodeInt(String).");
+            } catch (Throwable t) {
+                Log.e(LOG_TAG, "Hook com.tencent.mmkv.MMKV.decodeInt(String) error.", t);
+            }
+
+            try {
+                findAndHookMethod(mmkvClass, "decodeInt", String.class, int.class, callBack);
+                Log.i(LOG_TAG, "Successfully hooked com.tencent.mmkv.MMKV.decodeInt(String, int).");
+            } catch (Throwable t) {
+                Log.e(LOG_TAG, "Hook com.tencent.mmkv.MMKV.decodeInt(String, int) error.", t);
+            }
+
+            try {
+                findAndHookMethod(mmkvClass, "getInt", String.class, int.class, callBack);
+                Log.i(LOG_TAG, "Successfully hooked com.tencent.mmkv.MMKV.getInt(String, int).");
+            } catch (Throwable t) {
+                Log.e(LOG_TAG, "Hook com.tencent.mmkv.MMKV.getInt(String, int) error.", t);
+            }
         } catch (Throwable t) {
-            Log.e(LOG_TAG, "Hook startActivity() error.", t);
-        }*/
+            Log.e(LOG_TAG, "hook() error.", t);
+        }
     }
 }
 
