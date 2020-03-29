@@ -47,8 +47,8 @@ public class XposedMain implements IXposedHookLoadPackage {
                 protected void beforeHookedMethod(MethodHookParam param) {
                     if (param.args[0].equals("BizTimeLineOpenStatus")) {
                         Log.i(LOG_TAG, "MMKV get config BizTimeLineOpenStatus called.");
-                        param.setResult(0);
-                        XposedHelpers.callMethod(param.thisObject, "putInt", "BizTimeLineOpenStatus", 0);
+                        param.setResult(1);
+                        XposedHelpers.callMethod(param.thisObject, "putInt", "BizTimeLineOpenStatus", 1);
                     }
                 }
             };
